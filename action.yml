@@ -1,0 +1,32 @@
+name: 'Carbon Markdown'
+description: 'Replace references to files by Carbon Now generated images'
+author: 'LAFFARGUE Nicolas'
+
+# Define your inputs here.
+inputs:
+  milliseconds:
+    description: 'Your input description here'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    - name: Setup Node.js
+      id: setup-node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: pnpm
+
+    - name: Install Carbon Now CLI
+      run: ./install-carbon-now-cli.sh
+      shell: bash
+      
+    - name: Carbon images in MD
+      run: node dist/index.js
+      shell: bash
