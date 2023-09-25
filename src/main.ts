@@ -43,24 +43,18 @@ export const run = async () => {
                 imageUrl: imageUrl
               }),
               linkUrl: linkUrl
-            })})`
+            })}`
           }
         )
         fs.writeFileSync(markdownFile, targetFileNameContent)
       })
     )
 
-    await git
-      .addConfig('user.email', 'users.noreply@github.com')
-      .addConfig('user.name', 'Github actions')
-
-    await git.add('-A')
-
-    await git.commit('files changed')
-
-    await git.push(undefined, undefined, {
-      '--force-with-lease': ''
-    })
+    await git.raw([
+      'add -A',
+      'commit --amend --no-edit',
+      'push --force-with-lease'
+    ])
 
     core.debug(new Date().toTimeString())
 

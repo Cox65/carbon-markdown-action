@@ -9053,18 +9053,15 @@ const run = () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
                         imageUrl: imageUrl
                     }),
                     linkUrl: linkUrl
-                })})`;
+                })}`;
             }));
             fs.writeFileSync(markdownFile, targetFileNameContent);
         })));
-        yield git
-            .addConfig('user.email', 'users.noreply@github.com')
-            .addConfig('user.name', 'Github actions');
-        yield git.add('-A');
-        yield git.commit('files changed');
-        yield git.push(undefined, undefined, {
-            '--force-with-lease': ''
-        });
+        yield git.raw([
+            'add -A',
+            'commit --amend --no-edit',
+            'push --force-with-lease'
+        ]);
         core.debug(new Date().toTimeString());
         core.setOutput('time', new Date().toTimeString());
     }
@@ -9092,7 +9089,7 @@ const util_1 = __nccwpck_require__(3837);
 const execPromise = (0, util_1.promisify)(child_process_1.exec);
 const carbonNow = (sourceFile, targetFolder, targetFile) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const resultFilePath = path_1.default.join(targetFolder, targetFile + '.png');
-    yield execPromise(`npx carbon-now ${sourceFile} --engine webkit --save-to ${targetFolder} --save-as ${targetFile} --config carbon-config.json -p hacker`);
+    yield execPromise(`carbon-now ${sourceFile} --engine webkit --save-to ${targetFolder} --save-as ${targetFile} --config carbon-config.json -p hacker`);
     return resultFilePath;
 });
 exports.carbonNow = carbonNow;

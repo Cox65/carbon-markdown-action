@@ -11,7 +11,7 @@ export const carbonNow = async (
 ) => {
   const resultFilePath = path.join(targetFolder, targetFile + '.png')
   await execPromise(
-    `npx carbon-now ${sourceFile} --engine webkit --save-to ${targetFolder} --save-as ${targetFile} --config carbon-config.json -p hacker`
+    `carbon-now ${sourceFile} --engine webkit --save-to ${targetFolder} --save-as ${targetFile} --config carbon-config.json -p hacker`
   )
   return resultFilePath
 }

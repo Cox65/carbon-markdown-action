@@ -67,7 +67,6 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "carbon-now-cli": "^2.0.0",
     "glob": "^10.3.10",
     "simple-git": "^3.20.0",
     "tslib": "^2.6.2",

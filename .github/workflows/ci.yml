@@ -35,6 +35,10 @@ jobs:
         id: install
         run: pnpm i
 
+      - name: Install CarbonNow CLI
+        id: install-carbon
+        run: npm i -g carbon-now-cli --force
+
       - name: Test Local Action
         id: test-action
         uses: ./
