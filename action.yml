@@ -1,0 +1,75 @@
+name: 'Carbon Markdown'
+description: 'Replace references to files by Carbon Now generated images'
+author: 'LAFFARGUE Nicolas'
+
+inputs:
+  searchPatterns:
+    description: 'A comma separated list of patterns used to search for Markdown files to transform.'
+    required: false
+    default: '**/*.md'
+  ignorePatterns:
+    description: 'The list of patterns for files to exclude.'
+    required: false
+    default: 'node_modules/**'
+  outputFolderName:
+    description: 'Name of the folder used to generate Carbon images'
+    required: false
+    default: carbon
+  carbonConfigFile:
+    description: 'Path to the carbon configuration file'
+    required: true
+  defaultCarbonPreset:
+    description: 'Name of the default preset to use for formatting generated images'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup PNPM
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    - name: Setup Node.js
+      id: setup-node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: pnpm
+
+    - name: Install Playwright
+      run: pnpm install -g @playwright/test
+      shell: bash
+
+    - name: Store Playwright's Version
+      run: |
+          PLAYWRIGHT_VERSION=$(pnpm ls @playwright/test -g | grep @playwright | sed 's/.*@//')
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Cache Playwright Browsers for Playwright's Version
+      id: cache-playwright-browsers
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+
+    - name: Setup Playwright with Chromium
+      if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+      run: pnpx playwright install --with-deps chromium
+      shell: bash
+
+    - name: Install Carbon Now CLI
+      run: pnpm install -g carbon-now-cli --ignore-scripts
+      shell: bash
+
+    - name: Carbon images in Markdown files
+      run: node dist/index.js
+      shell: bash
+      env:
+        SEARCH_PATTERNS: ${{ inputs.searchPatterns }}
+        IGNORE_PATTERNS: ${{ inputs.ignorePatterns }}
+        OUTPUT_FOLDER_NAME: ${{ inputs.outputFolderName }}
+        CARBON_CONFIG_FILE: ${{ inputs.carbonConfigFile }}
+        DEFAULT_CARBON_PRESET: ${{ inputs.defaultCarbonPreset }}
