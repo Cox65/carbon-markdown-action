@@ -4952,21 +4952,24 @@ const run = () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
         const markdownFiles = yield (0, glob_1.glob)(searchPatterns, {
             ignore: ignorePatterns
         });
-        fs.rmSync(outputFolderName, { recursive: true, force: true });
         yield Promise.all(markdownFiles.map((markdownFile) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
             core.info('Processing ' + markdownFile);
             const templateFileContent = fs.readFileSync(markdownFile, 'utf8');
             const matches = [...templateFileContent.matchAll(CARBON_REGEX)];
+            const carbonTargetFolder = path_1.default.join(path_1.default.dirname(markdownFile), outputFolderName);
+            fs.rmSync(carbonTargetFolder, { recursive: true, force: true });
             const replacements = yield Promise.all(matches.map((match) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
                 var _a;
                 const [, carbonFullTag, carbonDefinitionString, existingCarbonResult] = match;
                 const uuid = shortuuid.generate();
                 const carbonDefinition = JSON.parse(carbonDefinitionString);
                 const filePath = path_1.default.join(path_1.default.dirname(markdownFile), carbonDefinition.filename);
-                const linkUrl = (0, github_1.buildGithubFileUrl)(carbonDefinition.filename, 'blob');
+                const linkUrl = (0, github_1.buildGithubFileUrl)(filePath, 'blob');
+                const targetFolder = path_1.default.join(carbonTargetFolder, uuid);
+                core.info('Deleting folder  ' + targetFolder);
                 const imageUrl = (0, github_1.buildGithubFileUrl)(yield (0, carbonNow_1.carbonNow)({
                     sourceFile: filePath,
-                    targetFolder: path_1.default.join(outputFolderName, uuid),
+                    targetFolder,
                     targetFile: path_1.default.basename(carbonDefinition.filename),
                     configFile: carbonConfigFile,
                     preset: (_a = carbonDefinition.preset) !== null && _a !== void 0 ? _a : defaultCarbonPreset
@@ -5016,7 +5019,7 @@ const exec_1 = __nccwpck_require__(8445);
 const path_1 = tslib_1.__importDefault(__nccwpck_require__(1017));
 const carbonNow = ({ sourceFile, targetFolder, targetFile, configFile, preset }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const resultFilePath = path_1.default.join(targetFolder, targetFile + '.png');
-    yield (0, exec_1.exec)(`carbon-now ${sourceFile} --save-to ${targetFolder} --save-as ${targetFile} --config ${configFile} -p ${preset}`);
+    yield (0, exec_1.exec)(`carbon-now ${sourceFile} --engine chromium --save-to ${targetFolder} --save-as ${targetFile} --config ${configFile} -p ${preset}`);
     return resultFilePath;
 });
 exports.carbonNow = carbonNow;

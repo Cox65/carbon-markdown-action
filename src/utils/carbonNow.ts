@@ -18,7 +18,7 @@ export const carbonNow = async ({
 }: CarbonNowParams) => {
   const resultFilePath = path.join(targetFolder, targetFile + '.png')
   await exec(
-    `carbon-now ${sourceFile} --save-to ${targetFolder} --save-as ${targetFile} --config ${configFile} -p ${preset}`
+    `carbon-now ${sourceFile} --engine chromium --save-to ${targetFolder} --save-as ${targetFile} --config ${configFile} -p ${preset}`
   )
   return resultFilePath
 }

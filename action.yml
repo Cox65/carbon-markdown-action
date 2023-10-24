@@ -4,7 +4,9 @@ author: 'LAFFARGUE Nicolas'
 
 inputs:
   searchPatterns:
-    description: 'A comma separated list of patterns used to search for Markdown files to transform.'
+    description:
+      'A comma separated list of patterns used to search for Markdown files to
+      transform.'
     required: false
     default: '**/*.md'
   ignorePatterns:
@@ -19,7 +21,8 @@ inputs:
     description: 'Path to the carbon configuration file'
     required: true
   defaultCarbonPreset:
-    description: 'Name of the default preset to use for formatting generated images'
+    description:
+      'Name of the default preset to use for formatting generated images'
     required: true
 
 runs:
@@ -36,9 +39,9 @@ runs:
 
     - name: Store Playwright's Version
       run: |
-          PLAYWRIGHT_VERSION=$(pnpm ls @playwright/test -g | grep @playwright | sed 's/.*@//')
-          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
-          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+        PLAYWRIGHT_VERSION=$(pnpm ls @playwright/test -g | grep @playwright | sed 's/.*@//')
+        echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+        echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
       shell: bash
 
     - name: Cache Playwright Browsers for Playwright's Version
@@ -48,7 +51,7 @@ runs:
         path: ~/.cache/ms-playwright
         key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
 
-    - name: Setup Playwright with Chromium
+    - name: Setup Playwright with Webkit
       if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
       run: pnpx playwright install --with-deps chromium
       shell: bash

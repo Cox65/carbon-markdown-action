@@ -39,14 +39,18 @@ export const run = async () => {
       ignore: ignorePatterns
     })
 
-    fs.rmSync(outputFolderName, { recursive: true, force: true })
-
     await Promise.all(
       markdownFiles.map(async markdownFile => {
         core.info('Processing ' + markdownFile)
 
         const templateFileContent = fs.readFileSync(markdownFile, 'utf8')
         const matches = [...templateFileContent.matchAll(CARBON_REGEX)]
+        const carbonTargetFolder = path.join(
+          path.dirname(markdownFile),
+          outputFolderName
+        )
+
+        fs.rmSync(carbonTargetFolder, { recursive: true, force: true })
 
         const replacements = await Promise.all(
           matches.map(async match => {
@@ -67,14 +71,16 @@ export const run = async () => {
               carbonDefinition.filename
             )
 
-            const linkUrl = buildGithubFileUrl(
-              carbonDefinition.filename,
-              'blob'
-            )
+            const linkUrl = buildGithubFileUrl(filePath, 'blob')
+
+            const targetFolder = path.join(carbonTargetFolder, uuid)
+
+            core.info('Deleting folder  ' + targetFolder)
+
             const imageUrl = buildGithubFileUrl(
               await carbonNow({
                 sourceFile: filePath,
-                targetFolder: path.join(outputFolderName, uuid),
+                targetFolder,
                 targetFile: path.basename(carbonDefinition.filename),
                 configFile: carbonConfigFile,
                 preset: carbonDefinition.preset ?? defaultCarbonPreset
